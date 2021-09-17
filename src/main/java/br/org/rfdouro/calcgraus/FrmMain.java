@@ -5,9 +5,15 @@
  */
 package br.org.rfdouro.calcgraus;
 
+import com.github.weisj.darklaf.LafManager;
+import com.github.weisj.darklaf.theme.DarculaTheme;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import javax.swing.JOptionPane;
+import mdlaf.MaterialLookAndFeel;
+import mdlaf.themes.MaterialOceanicTheme;
+import mdlaf.themes.MaterialTheme;
 
 /**
  *
@@ -46,6 +52,7 @@ public class FrmMain extends javax.swing.JFrame {
   edtCoordResGeo = new javax.swing.JTextField();
 
   setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+  setTitle("Conversor de coordenadas");
 
   edtCoordDec.setText("-12.145341434999921");
 
@@ -86,7 +93,7 @@ public class FrmMain extends javax.swing.JFrame {
     .addComponent(edtCoordDec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
     .addComponent(jButton1)
-    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
+    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
     .addComponent(jLabel2)
     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
     .addComponent(edtCoordResDec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -134,7 +141,7 @@ public class FrmMain extends javax.swing.JFrame {
     .addComponent(edtCoordGeo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
     .addComponent(jButton2)
-    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
+    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
     .addComponent(jLabel4)
     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
     .addComponent(edtCoordResGeo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -161,6 +168,7 @@ public class FrmMain extends javax.swing.JFrame {
   );
 
   pack();
+  setLocationRelativeTo(null);
  }// </editor-fold>//GEN-END:initComponents
 
  private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -184,31 +192,36 @@ public class FrmMain extends javax.swing.JFrame {
   _s = _s.multiply(BigDecimal.valueOf(3600), mc);
 
   if (isNeg)
-   edtCoordResDec.setText("-" + d + "o " + m + "' " + _s + "'' ");
+   edtCoordResDec.setText("-" + d + "°" + m + "'" + _s + "''");
   else
-   edtCoordResDec.setText("" + d + "o " + m + "' " + _s + "'' ");
+   edtCoordResDec.setText("" + d + "°" + m + "'" + _s + "''");
  }//GEN-LAST:event_jButton1ActionPerformed
 
  private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-  MathContext mc = new MathContext(17, RoundingMode.HALF_UP);
-  String t = edtCoordGeo.getText();
-  String sd = t.substring(0, t.indexOf("°"));
-  String sm = t.substring(t.indexOf("°") + 1, t.indexOf("'"));
-  String ss = t.substring(t.indexOf("'") + 1, t.indexOf("''"));
+  try {
+   MathContext mc = new MathContext(17, RoundingMode.HALF_UP);
+   String t = edtCoordGeo.getText();
+   String sd = t.substring(0, t.indexOf("°"));
+   String sm = t.substring(t.indexOf("°") + 1, t.indexOf("'"));
+   String ss = t.substring(t.indexOf("'") + 1, t.indexOf("''"));
 
-  BigDecimal d = new BigDecimal(sd);
-  boolean isNeg = d.doubleValue() < 0;
-  if (isNeg) {
-   d = d.negate();
+   BigDecimal d = new BigDecimal(sd);
+   boolean isNeg = d.doubleValue() < 0;
+   if (isNeg) {
+    d = d.negate();
+   }
+
+   d = d.add((new BigDecimal(sm)).divide(new BigDecimal(60), mc));
+   d = d.add((new BigDecimal(ss)).divide(new BigDecimal(3600), mc));
+
+   if (isNeg) {
+    edtCoordResGeo.setText("-" + d.abs(mc));
+   } else {
+    edtCoordResGeo.setText("" + d.abs(mc));
+   }
+  } catch (Exception ex) {
+   JOptionPane.showMessageDialog(this, ex.getMessage());
   }
-  
-  d = d.add((new BigDecimal(sm)).divide(new BigDecimal(60), mc)).add((new BigDecimal(ss)).divide(new BigDecimal(3600)));
-  
-
-  if (isNeg)
-   edtCoordResGeo.setText("-" + d.abs(mc));
-  else
-   edtCoordResGeo.setText("" + d.abs(mc));
  }//GEN-LAST:event_jButton2ActionPerformed
 
  /**
@@ -216,24 +229,17 @@ public class FrmMain extends javax.swing.JFrame {
   */
  public static void main(String args[]) {
   /* Set the Nimbus look and feel */
-  //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-  /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-   */
+  //https://github.com/weisJ/darklaf
+  //https://github.com/vincenzopalazzo/material-ui-swing/
+  
+  MaterialOceanicTheme materialOceanicTheme = new MaterialOceanicTheme();
+  MaterialLookAndFeel andFeel = new MaterialLookAndFeel(materialOceanicTheme);
+
   try {
-   for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-    if ("Nimbus".equals(info.getName())) {
-     javax.swing.UIManager.setLookAndFeel(info.getClassName());
-     break;
-    }
-   }
-  } catch (ClassNotFoundException ex) {
-   java.util.logging.Logger.getLogger(FrmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-  } catch (InstantiationException ex) {
-   java.util.logging.Logger.getLogger(FrmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-  } catch (IllegalAccessException ex) {
-   java.util.logging.Logger.getLogger(FrmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-  } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+   //javax.swing.UIManager.setLookAndFeel(andFeel);
+   //LafManager.install();
+   LafManager.install(new DarculaTheme());
+  } catch (Exception ex) {
    java.util.logging.Logger.getLogger(FrmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
   }
   //</editor-fold>
